@@ -2,24 +2,24 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 const Movie = require('../models/movie');
 
-module.exports.getCards = (req, res, next) => {
+module.exports.getMovies = (req, res, next) => {
   Movie.find({})
-    .then((cards) => res.send(cards))
+    .then((movies) => res.send(movies))
     .catch(next);
 };
 
-module.exports.createCard = (req, res, next) => {
+module.exports.createMovie = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Movie.create({ name, link, owner })
-    .then((card) => Movie.populate(card, { path: 'owner', select: '-password -__v' }))
-    .then((card) => {
-      res.status(201).send({ card, message: 'Карточка создана' });
+    .then((movie) => Movie.populate(movie, { path: 'owner', select: '-password -__v' }))
+    .then((movie) => {
+      res.status(201).send({ movie, message: 'Карточка создана' });
     })
     .catch(next);
 };
 
-module.exports.deleteCard = (req, res, next) => {
+module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(req.params.cardId)
     .then((movie) => {
       if (!movie) {
