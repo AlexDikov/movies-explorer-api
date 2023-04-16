@@ -19,17 +19,15 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name, email, password,
   } = req.body;
   bcryptjs.hash(password, 10)
     .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
+      name, email, password: hash,
     }))
     .then((user) => {
       res.send({
-        data: {
-          name: user.name, about: user.about, avatar: user.avatar, email: user.email,
-        },
+        name: user.name, email: user.email,
       });
     })
     .catch((err) => {
@@ -43,7 +41,7 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  const secretKey = process.env.JWT_SECRET_KEY;
+  const secretKey = process.env.JWT_SECRET;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -55,11 +53,11 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.modifyUser = (req, res, next) => {
-  const { name, about } = req.body;
+  const { name, email } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
+    { name, email },
     {
       new: true,
       runValidators: true,

@@ -38,8 +38,7 @@ const movieSchema = new mongoose.Schema({
     pattern: regexLink,
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    type: String,
     required: true,
   },
   movieId: {
