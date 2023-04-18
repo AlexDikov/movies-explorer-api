@@ -38,11 +38,11 @@ const movieSchema = new mongoose.Schema({
     pattern: regexLink,
   },
   owner: {
-    type: String,
+    type: mongoose.ObjectId,
     required: true,
   },
   movieId: {
-    type: String,
+    type: Number,
     required: true,
   },
   nameRU: {

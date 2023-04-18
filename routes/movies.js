@@ -9,8 +9,8 @@ const { regexLink } = require('../utils/constants');
 
 router.get('/', getMovies);
 
-router.delete('/:movieId', celebrate({
-  params: Joi.object().keys({ movieId: Joi.string().hex().length(24).required() }),
+router.delete('/:_id', celebrate({
+  params: Joi.object().keys({ _id: Joi.string().hex().length(24).required() }),
 }), deleteMovie);
 
 router.post('/', celebrate({

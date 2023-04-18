@@ -3,7 +3,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const Movie = require('../models/movie');
 
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
+  Movie.find({ owner: req.user._id })
     .then((movies) => res.send(movies))
     .catch(next);
 };
@@ -44,15 +44,15 @@ module.exports.createMovie = (req, res, next) => {
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.movieId)
+  Movie.findById(req.params._id)
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError('Карточка не найдена');
+        next(new NotFoundError('Карточка не найдена'));
       }
-      if (movie.owner._id.toString() !== req.user._id) {
-        throw new ForbiddenError('Невозможно удалить карточку другого пользователя');
+      if (movie.owner.toString() !== req.user._id) {
+        next(new ForbiddenError('Невозможно удалить карточку другого пользователя'));
       }
-      return Movie.deleteOne({ _id: req.params.cardId })
+      return Movie.deleteOne({ _id: req.params._id })
         .then(() => { res.send({ data: movie }); });
     })
     .catch(next);

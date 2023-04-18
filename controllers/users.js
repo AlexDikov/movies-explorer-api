@@ -9,7 +9,7 @@ module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Нет пользователя с таким id');
+        next(new NotFoundError('Нет пользователя с таким id'));
       } else {
         res.send(user);
       }
@@ -41,7 +41,7 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  const secretKey = process.env.JWT_SECRET;
+  const secretKey = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'some-secret-key';
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -65,8 +65,14 @@ module.exports.modifyUser = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Ошибка ввода');
+        next(new NotFoundError('Ошибка ввода'));
       } else res.send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      } else {
+        next(err);
+      }
+    });
 };

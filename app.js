@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-mongoose.connect('mongodb://127.0.0.1:27017/moviesdb');
+mongoose.connect(`mongodb://127.0.0.1:27017/${process.env.ADRESS}`);
 
 app.use(cors());
 
@@ -51,16 +52,17 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
 
   res
     .status(statusCode)
     .send({
       message: statusCode === 500
-        ? 'На сарваре произошла ошибка'
+        ? 'На сервере произошла ошибка'
         : message,
     });
+  next();
 });
 
 app.listen(PORT, () => {
