@@ -1,6 +1,7 @@
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 const Movie = require('../models/movie');
+const { unexistingCardError, forbiddenErrorMessage } = require('../utils/constants');
 
 module.exports.getMovies = (req, res, next) => {
   Movie.find({ owner: req.user._id })
@@ -47,10 +48,10 @@ module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(req.params._id)
     .then((movie) => {
       if (!movie) {
-        next(new NotFoundError('Карточка не найдена'));
+        next(new NotFoundError(unexistingCardError));
       }
       if (movie.owner.toString() !== req.user._id) {
-        next(new ForbiddenError('Невозможно удалить карточку другого пользователя'));
+        next(new ForbiddenError(forbiddenErrorMessage));
       }
       return Movie.deleteOne({ _id: req.params._id })
         .then(() => { res.send({ data: movie }); });

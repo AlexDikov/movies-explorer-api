@@ -3,13 +3,14 @@ const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 const User = require('../models/user');
+const { invalidIdError, conflictErrorMessage, invalidDataError } = require('../utils/constants');
 require('dotenv').config();
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Нет пользователя с таким id'));
+        next(new NotFoundError(invalidIdError));
       } else {
         res.send(user);
       }
@@ -32,7 +33,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+        next(new ConflictError(conflictErrorMessage));
       } else {
         next(err);
       }
@@ -65,12 +66,12 @@ module.exports.modifyUser = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Ошибка ввода'));
+        next(new NotFoundError(invalidDataError));
       } else res.send(user);
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+        next(new ConflictError(conflictErrorMessage));
       } else {
         next(err);
       }
